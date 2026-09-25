@@ -160,7 +160,7 @@ label{display:block;font-size:13px;font-weight:700;margin:13px 0 6px}input,texta
 </div>
 
 <script>
-let qty=1, PRICE=999, DELIVERY=250;
+let qty=1, PRICE=999, DELIVERY=250;\nconst GOOGLE_SHEET_API = 'https://script.google.com/macros/s/AKfycbwir_nM0wIu5UxdgbvkobfxayOONctkqMeGPQSqtN-QzmG4Aaa8I3so8OcuZ-9jRCff/exec';
 
 function money(n){return 'Rs. '+n.toLocaleString('en-PK');}
 function updateSummary(){
@@ -175,7 +175,7 @@ function changeQty(n){qty=Math.max(1,Math.min(10,qty+n));updateSummary();}
 function openOrder(){document.getElementById('orderModal').style.display='block';document.body.style.overflow='hidden';updateSummary();}
 function closeOrder(){document.getElementById('orderModal').style.display='none';document.body.style.overflow='auto';}
 
-function confirmOrder(){
+async function confirmOrder(){
   const name=document.getElementById('name').value.trim();
   const phone=document.getElementById('phone').value.trim();
   const address=document.getElementById('address').value.trim();
@@ -186,6 +186,7 @@ function confirmOrder(){
     alert('Please fill all required fields.');
     return;
   }
+
   if(!/^03\d{9}$/.test(phone)){
     alert('Please enter a valid 11-digit Pakistani mobile number starting with 03.');
     document.getElementById('phone').focus();
@@ -199,23 +200,50 @@ function confirmOrder(){
     '<br><b>Phone:</b> '+escapeHtml(phone)+
     '<br><b>Address:</b> '+escapeHtml(address)+
     '<br><b>City:</b> '+escapeHtml(city)+
-    (landmark?'<br><b>Nearest Place:</b> '+escapeHtml(landmark):'');
+    '<br><b>Nearest Place:</b> '+escapeHtml(landmark);
 
   document.getElementById('thankSummary').innerHTML =
     '<div class="row"><span>Multifunction Emergency LED Flashlight × '+qty+'</span><b>'+money(PRICE*qty)+'</b></div>'+
     '<div class="row"><span>Delivery Charges</span><b>'+money(DELIVERY)+'</b></div>'+
     '<div class="row total"><span>Order Total</span><b>'+money(total)+'</b></div>';
 
-  // Show a short processing screen for 1 second.
   const modal=document.getElementById('orderModal');
   const card=modal.querySelector('.card');
   const original=card.innerHTML;
+
   card.innerHTML =
     '<div style="text-align:center;padding:35px 10px">'+
       '<div class="success-icon" style="margin-bottom:20px">✓</div>'+
       '<h2 style="margin-bottom:8px">Processing Your Order...</h2>'+
       '<p style="color:#666;margin:0">Please wait a moment.</p>'+
     '</div>';
+
+  // Send order to Google Sheet.
+  const orderData = {
+    name: name,
+    phone: phone,
+    address: address,
+    city: city,
+    landmark: landmark,
+    product: 'Multifunction Emergency LED Flashlight',
+    quantity: qty,
+    productAmount: PRICE * qty,
+    delivery: DELIVERY,
+    total: total
+  };
+
+  try {
+    await fetch(GOOGLE_SHEET_API, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(orderData)
+    });
+  } catch (error) {
+    console.error('Google Sheet submission error:', error);
+  }
 
   setTimeout(function(){
     card.innerHTML=original;

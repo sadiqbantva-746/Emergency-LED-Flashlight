@@ -36,6 +36,19 @@ label{display:block;font-size:13px;font-weight:700;margin:13px 0 6px}input,texta
 .ty{text-align:center}.detail{background:#fafafa;border:1px solid #eee;border-radius:12px;padding:15px;margin:18px 0;text-align:left}.detail strong{display:block;margin-bottom:3px}.continue{background:#111;color:#fff;border:0;width:100%;padding:14px;border-radius:9px;font-weight:800;cursor:pointer}
 .note{font-size:12px;color:#777;text-align:center;margin-top:10px}
 @media(max-width:760px){header{padding:15px 18px}.hero{grid-template-columns:1fr;gap:24px}.product-box{min-height:370px;padding:20px}h1{font-size:34px}.features{grid-template-columns:1fr}.container{padding:20px 15px}.section{padding:38px 0}.review{width:260px}.card{margin:15px auto;padding:20px}}
+
+.thank-card{max-width:620px!important}
+.ty-label{font-size:12px;font-weight:900;letter-spacing:1.5px;color:#a47736;margin-top:4px}
+.ty h2{font-size:30px;margin:8px 0 8px}
+.ty-sub{color:#666;line-height:1.55;margin:0 0 22px}
+.order-confirmed-box{display:flex;align-items:center;gap:12px;background:#f5f8f5;border:1px solid #dfe9df;border-radius:12px;padding:14px;margin:18px 0}
+.oc-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#111;color:#fff;font-weight:900}
+.order-confirmed-box strong{display:block;font-size:14px}
+.order-confirmed-box span{display:block;color:#666;font-size:12px;margin-top:3px}
+.detail h3{font-size:16px;margin:0 0 12px}
+.detail{line-height:1.8}
+.thank-note{background:#fff8eb;border:1px solid #f1d8a8;border-radius:10px;padding:12px;font-size:12px;color:#665333;margin:15px 0;text-align:left;line-height:1.5}
+
 </style>
 </head>
 <body>
@@ -110,19 +123,40 @@ label{display:block;font-size:13px;font-weight:700;margin:13px 0 6px}input,texta
  </div>
 </div>
 
-<!-- THANK YOU PAGE -->
+
+<!-- FULL THANK YOU PAGE -->
 <div class="thankyou" id="thankyou">
- <div class="card ty">
-   <div class="success-icon">✓</div>
-   <h2>Thank You For Your Order!</h2>
-   <p style="color:#666">Your order has been received successfully.</p>
-   <div class="detail">
-     <strong>Customer Details</strong>
-     <div id="customerDetails"></div>
-   </div>
-   <div class="summary" id="thankSummary"></div>
-   <button class="continue" onclick="continueShopping()">Continue Shopping</button>
- </div>
+  <div class="card thank-card">
+    <div class="success-icon">✓</div>
+    <div class="ty">
+      <div class="ty-label">ORDER CONFIRMED</div>
+      <h2>Thank You For Your Order!</h2>
+      <p class="ty-sub">Your order has been received successfully. Our team will contact you for confirmation.</p>
+    </div>
+
+    <div class="order-confirmed-box">
+      <div class="oc-icon">✓</div>
+      <div>
+        <strong>Order Confirmed</strong>
+        <span>Your order details are shown below.</span>
+      </div>
+    </div>
+
+    <div class="detail">
+      <h3>Customer Details</h3>
+      <div id="customerDetails"></div>
+    </div>
+
+    <div class="summary" id="thankSummary">
+      <!-- Filled automatically after order confirmation -->
+    </div>
+
+    <div class="thank-note">
+      📦 Please keep your phone available. Our representative may contact you to confirm the order.
+    </div>
+
+    <button class="continue" onclick="continueShopping()">Continue Shopping</button>
+  </div>
 </div>
 
 <script>
@@ -168,7 +202,7 @@ function confirmOrder(){
     (landmark?'<br><b>Nearest Place:</b> '+escapeHtml(landmark):'');
 
   document.getElementById('thankSummary').innerHTML =
-    '<div class="row"><span>Emergency LED Flashlight × '+qty+'</span><b>'+money(PRICE*qty)+'</b></div>'+
+    '<div class="row"><span>Multifunction Emergency LED Flashlight × '+qty+'</span><b>'+money(PRICE*qty)+'</b></div>'+
     '<div class="row"><span>Delivery Charges</span><b>'+money(DELIVERY)+'</b></div>'+
     '<div class="row total"><span>Order Total</span><b>'+money(total)+'</b></div>';
 
@@ -193,6 +227,7 @@ function confirmOrder(){
 function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
 function continueShopping(){
   document.getElementById('thankyou').style.display='none';
+  document.getElementById('orderModal').style.display='none';
   document.body.style.overflow='auto';
   ['name','phone','address','city','landmark'].forEach(id=>document.getElementById(id).value='');
   qty=1;updateSummary();window.scrollTo({top:0,behavior:'smooth'});
